@@ -5,7 +5,7 @@ Projeto da disciplina ISN 75620501, edição 2026.2.
 ## Escolhas tecnológicas
 
 - Nuvem: [AWS](https://aws.amazon.com)
-- Ferrramenta de IaC: [Pulumi](https://www.pulumi.com/) com [Python](https://www.pulumi.com/docs/iac/languages-sdks/python/)
+- Ferramenta de IaC: [Pulumi](https://www.pulumi.com/) com [Python](https://www.pulumi.com/docs/iac/languages-sdks/python/)
 
 ## Referências
 
