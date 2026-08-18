@@ -1,6 +1,6 @@
 all: install
 
-install: aws_cli aws_sam_cli pulumi uv
+install: aws_cli aws_sam_cli pulumi uv shell
 
 aws_cli:
 	curl -sL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -8,7 +8,6 @@ aws_cli:
 
 	rm -rf ~/.aws-cli
 	./aws/install -i ~/.aws-cli -b ~/.local/bin
-	echo "complete -C /home/codespace/.local/bin/aws_completer aws" > ~/.bashrc
 
 	rm -f awscliv2.zip
 	rm -rf aws
@@ -28,3 +27,7 @@ pulumi:
 
 uv:
 	curl -LsSf https://astral.sh/uv/install.sh | sh
+
+shell:
+	echo "complete -C /home/codespace/.local/bin/aws_completer aws" > ~/.bashrc
+	echo "export PATH=$PATH:~/.pulumi/bin" >> ~/.bashrc
