@@ -7,6 +7,33 @@ Projeto da disciplina ISN 75620501, edição 2026.2.
 - Nuvem: [AWS](https://aws.amazon.com)
 - Ferramenta de IaC: [Pulumi](https://www.pulumi.com/) com [Python](https://www.pulumi.com/docs/iac/languages-sdks/python/)
 
+## Preparação do ambiente
+
+No serviço [IAM](https://console.aws.amazon.com/iam/):
+
+1. Criar um [grupo de usuário](https://console.aws.amazon.com/iam#/groups).
+1. Criar um [usuário](https://console.aws.amazon.com/iam#/users) e associá-lo ao grupo criado. Importante: esse usuário não deve ter acesso ao AWS Management Console.
+1. Criar uma política de acordo com [iam-policy.json](iam-policy.json) e associá-la ao grupo criado.
+1. De volta ao usuário criado, deve-se criar uma chave de acesso, a qual é composta por um identificador (`AWS_ACCESS_KEY_ID`) e a chave propriamente dita (`AWS_SECRET_ACCESS_KEY`).
+
+No [GitHub Codespaces](https://github.com/settings/codespaces):
+
+- `AWS_ACCESS_KEY_ID`: identificador da chave de acesso ao AWS.
+- `AWS_SECRET_ACCESS_KEY`: chave de acesso ao AWS, propriamente dita.
+- `AWS_DEFAULT_REGION`: região da AWS. Por convenção, na equipe será adotado por padrão São Paulo (`sa-east-1`).
+- `PULUMI_ACCESS_TOKEN`: chave de acesso ao Pulumi.
+
+Fonte:
+
+- [Configuring environment variables for the AWS CLI](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-envvars.html)
+- [pulumi login | CLI commands](https://www.pulumi.com/docs/iac/cli/commands/pulumi_login/).
+
+### A executar em cada codespace
+
+```bash
+make install
+```
+
 ## Referências
 
 ### Livros
