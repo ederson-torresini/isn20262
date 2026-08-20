@@ -29,5 +29,5 @@ uv:
 	curl -LsSf https://astral.sh/uv/install.sh | sh
 
 shell:
-	echo "complete -C /home/codespace/.local/bin/aws_completer aws" > ~/.bashrc
-	echo "export PATH=$PATH:~/.pulumi/bin" >> ~/.bashrc
+	echo "complete -C ${HOME}/.local/bin/aws_completer aws" > ${HOME}/.bashrc
+	echo "export PATH=${PATH}:${HOME}/.local/bin:${HOME}/.pulumi/bin" >> ${HOME}/.bashrc
