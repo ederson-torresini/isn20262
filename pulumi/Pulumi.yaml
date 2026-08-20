@@ -1,0 +1,10 @@
+name: isn20262
+description: ISN 2026.2
+runtime:
+  name: python
+  options:
+    toolchain: uv
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-python
