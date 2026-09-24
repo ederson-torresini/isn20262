@@ -1,95 +1,92 @@
-# Infraestrutura AWS (VPC + EC2) via Pulumi
+ # AWS Python S3 Bucket Pulumi Template
 
-Programa Pulumi em Python que provisiona uma VPC com subnet pública e uma instância EC2 (`t3.micro`, elegível ao free tier) para acesso remoto via SSH.
+ A minimal Pulumi template for provisioning a single AWS S3 bucket using Python.
 
-## Recursos provisionados
+ ## Overview
 
-- **VPC** (`10.0.0.0/16`) com DNS habilitado.
-- **Internet Gateway** anexado à VPC.
-- **Subnet pública** (`10.0.1.0/24`, `sa-east-1a`) com atribuição automática de IP público.
-- **Route table** pública, roteando `0.0.0.0/0` para o Internet Gateway.
-- **Security group** liberando entrada em `22` (SSH), `80` (HTTP) e `443` (HTTPS), e toda saída.
-- **Par de chaves SSH** (`tls.PrivateKey` + `ec2.KeyPair`), gerado automaticamente pelo Pulumi.
-- **Instância EC2** `t3.micro` com Amazon Linux 2023 (AMI mais recente), na subnet pública, usando o par de chaves gerado.
+ This template provisions an S3 bucket (`pulumi_aws.s3.BucketV2`) in your AWS account and exports its ID as an output. It’s an ideal starting point when:
+  - You want to learn Pulumi with AWS in Python.
+  - You need a barebones S3 bucket deployment to build upon.
+  - You prefer a minimal template without extra dependencies.
 
-## Pré-requisitos
+ ## Prerequisites
 
-- Conta AWS com permissões para criar recursos de VPC, EC2 e chaves (`ec2:*`).
-- Credenciais AWS configuradas no ambiente (AWS CLI, variáveis de ambiente ou similar).
-- Pulumi CLI instalado e autenticado (`pulumi login`).
-- Python 3.12+ e [`uv`](https://docs.astral.sh/uv/) instalados.
+ - An AWS account with permissions to create S3 buckets.
+ - AWS credentials configured in your environment (for example via AWS CLI or environment variables).
+ - Python 3.6 or later installed.
+ - Pulumi CLI already installed and logged in.
 
-## Configuração
+ ## Getting Started
 
-Região definida em [Pulumi.dev.yaml](Pulumi.dev.yaml):
+ 1. Generate a new project from this template:
+    ```bash
+    pulumi new aws-python
+    ```
+ 2. Follow the prompts to set your project name and AWS region (default: `us-east-1`).
+ 3. Change into your project directory:
+    ```bash
+    cd <project-name>
+    ```
+ 4. Preview the planned changes:
+    ```bash
+    pulumi preview
+    ```
+ 5. Deploy the stack:
+    ```bash
+    pulumi up
+    ```
+ 6. Tear down when finished:
+    ```bash
+    pulumi destroy
+    ```
 
-```yaml
-config:
-  aws:region: sa-east-1
-```
+ ## Project Layout
 
-Para alterar a região:
+ After running `pulumi new`, your directory will look like:
+ ```
+ ├── __main__.py         # Entry point of the Pulumi program
+ ├── Pulumi.yaml         # Project metadata and template configuration
+ ├── requirements.txt    # Python dependencies
+ └── Pulumi.<stack>.yaml # Stack-specific configuration (e.g., Pulumi.dev.yaml)
+ ```
 
-```bash
-pulumi config set aws:region <regiao>
-```
+ ## Configuration
 
-## Deploy
+ This template defines the following config value:
 
-1. Instale as dependências do projeto:
-   ```bash
-   uv sync
-   ```
-2. Ative o ambiente virtual:
-   ```bash
-   source .venv/bin/activate
-   ```
-3. Selecione a stack (crie caso ainda não exista):
-   ```bash
-   pulumi stack select dev
-   ```
-4. Visualize as mudanças planejadas:
-   ```bash
-   pulumi preview
-   ```
-5. Aplique o deploy:
-   ```bash
-   pulumi up
-   ```
-6. Para destruir os recursos quando não forem mais necessários:
-   ```bash
-   pulumi destroy
-   ```
+ - `aws:region` (string)
+   The AWS region to deploy resources into.
+   Default: `us-east-1`
 
-## Outputs
+ View or update configuration with:
+ ```bash
+ pulumi config get aws:region
+ pulumi config set aws:region us-west-2
+ ```
 
-Após o `pulumi up`, a stack exporta:
+ ## Outputs
 
-- `vpc_id` — ID da VPC criada.
-- `public_subnet_id` — ID da subnet pública.
-- `security_group_id` — ID do security group.
-- `instance_id` — ID da instância EC2.
-- `instance_public_ip` — IP público da instância.
-- `key_pair_name` — nome do par de chaves associado à instância.
-- `ssh_private_key` — chave privada SSH (secreta).
+ Once deployed, the stack exports:
 
-Recupere os outputs com:
+ - `bucket_name` — the ID of the created S3 bucket.
 
-```bash
-pulumi stack output instance_public_ip
-```
+ Retrieve outputs with:
+ ```bash
+ pulumi stack output bucket_name
+ ```
 
-## Acesso via SSH
+ ## Next Steps
 
-A chave privada é exportada como _secret_ e não aparece em texto claro nos logs do Pulumi. Para recuperá-la e conectar na instância:
+ - Customize `__main__.py` to add or configure additional resources.
+ - Explore the Pulumi AWS SDK: https://www.pulumi.com/registry/packages/aws/
+ - Break your infrastructure into modules for better organization.
+ - Integrate into CI/CD pipelines for automated deployments.
 
-```bash
-pulumi stack output ssh_private_key --show-secrets > key.pem
-chmod 400 key.pem
-ssh -i key.pem ec2-user@$(pulumi stack output instance_public_ip)
-```
+ ## Help and Community
 
-## Ajuda
+ If you have questions or need assistance:
+ - Pulumi Documentation: https://www.pulumi.com/docs/
+ - Community Slack: https://slack.pulumi.com/
+ - GitHub Issues: https://github.com/pulumi/pulumi/issues
 
-- Documentação do Pulumi: https://www.pulumi.com/docs/
-- Pulumi AWS SDK: https://www.pulumi.com/registry/packages/aws/
+ Contributions and feedback are always welcome!
