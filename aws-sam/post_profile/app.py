@@ -17,7 +17,7 @@ def handler(event, context):
     except json.JSONDecodeError:
         return {"statusCode": 400, "body": json.dumps({"message": "Invalid JSON"})}
 
-    if not body.get("id") or not body.get("name"):
+    if not isinstance(body, dict) or not body.get("id") or not body.get("name"):
         return {
             "statusCode": 400,
             "body": json.dumps({"message": "id and name are required"}),
