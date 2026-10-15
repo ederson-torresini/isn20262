@@ -3,7 +3,6 @@
 Usa o mesmo código da Lambda (`../3-pulumi/lanchonetes`) com DynamoDB Local.
 
 ```bash
-cd aws-sam
 docker compose up -d                 # DynamoDB Local (rede sam-local)
 uv pip install boto3
 python seed.py                       # cria tabela e dados (requer boto3)
