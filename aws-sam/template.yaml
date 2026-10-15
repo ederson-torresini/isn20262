@@ -1,35 +1,26 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-
-Globals:
-  Function:
-    Runtime: python3.12
-    Timeout: 10
-    Environment:
-      Variables:
-        DYNAMODB_ENDPOINT: ""
+Description: Lanchonetes próximas (execução local com SAM)
 
 Resources:
-  PostProfileFunction:
+  LanchonetesProximas:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: post_profile/
-      Handler: app.handler
+      CodeUri: ../pulumi/lanchonetes/
+      Handler: handler.lambda_handler
+      Runtime: python3.13
+      Timeout: 10
+      Environment:
+        Variables:
+          TABLE_NAME: lanchonetes
+          # Declaradas aqui para que o env.json possa sobrescrevê-las.
+          DYNAMODB_ENDPOINT: ""
+          AWS_ACCESS_KEY_ID: ""
+          AWS_SECRET_ACCESS_KEY: ""
+          AWS_DEFAULT_REGION: ""
       Events:
-        Post:
+        Api:
           Type: Api
           Properties:
-            Path: /profile
+            Path: /lanchonetes-proximas
             Method: post
-
-  GetProfileFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: get_profile/
-      Handler: app.handler
-      Events:
-        Get:
-          Type: Api
-          Properties:
-            Path: /profile
-            Method: get

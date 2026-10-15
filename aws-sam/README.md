@@ -1,17 +1,26 @@
-# AWS SAM
+# Execução local com AWS SAM
 
-Ambiente de desenvolvimento local de funções AWS Lambda utilizando o _framework_ [AWS SAM](https://aws.amazon.com/serverless/sam/).
+Usa o mesmo código da Lambda (`../pulumi/lanchonetes`) com DynamoDB Local.
 
-É necessário ter instalado:
+```bash
+cd aws-sam
+docker compose up -d                 # DynamoDB Local (rede sam-local)
+uv pip install boto3
+python seed.py                       # cria tabela e dados (requer boto3)
+sam build
+sam local start-api --env-vars env.json --add-host host.docker.internal:host-gateway
+```
 
-- [Docker](https://www.docker.com/)
-- [AWS CLI](https://aws.amazon.com/cli/)
-- [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-- [tmux](https://github.com/tmux/tmux) (para executar o ambiente automatizado)
+Teste:
 
-Comandos para executar o ambiente local:
+```bash
+curl -X POST localhost:3000/lanchonetes-proximas \
+  -d '{"latitude": -23.55, "longitude": -46.63, "limite": 3}'
+```
 
-```sh
-aws login
-make
+Invocação direta:
+
+```bash
+sam local invoke LanchonetesProximas --env-vars env.json \
+  --add-host host.docker.internal:host-gateway -e event.json
 ```

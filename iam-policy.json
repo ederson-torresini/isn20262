@@ -1,18 +1,42 @@
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor0",
-            "Effect": "Allow",
-            "Action": [
-                "route53:CreateHostedZone",
-                "route53:GetHostedZone",
-                "route53:DeleteHostedZone",
-                "route53:getChange",
-                "route53:ListTagsForResource",
-                "ec2:DescribeVpcs"
-            ],
-            "Resource": "*"
-        }
-    ]
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:AttachRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:PutRolePolicy",
+        "iam:DetachRolePolicy",
+        "iam:get*",
+        "iam:list*",
+        "route53:CreateHostedZone",
+        "route53:GetHostedZone",
+        "route53:DeleteHostedZone",
+        "route53:getChange",
+        "route53:ListTagsForResource",
+        "ec2:DescribeVpcs",
+        "dynamodb:createTable",
+        "dynamodb:deleteTable",
+        "dynamodb:putItem",
+        "dynamodb:deleteItem",
+        "dynamodb:describe*",
+        "dynamodb:get*",
+        "dynamodb:list*",
+        "dynamodb:Scan",
+        "lambda:CreateFunction",
+        "lambda:DeleteFunction",
+        "lambda:get*",
+        "lambda:list*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["iam:PassRole"],
+      "Resource": "arn:aws:iam::*:role/*"
+    }
+  ]
 }
