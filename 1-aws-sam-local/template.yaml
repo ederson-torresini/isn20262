@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 10
+    Environment:
+      Variables:
+        DYNAMODB_ENDPOINT: ""
+
+Resources:
+  PostProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: post_profile/
+      Handler: app.handler
+      Events:
+        Post:
+          Type: Api
+          Properties:
+            Path: /profile
+            Method: post
+
+  GetProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get_profile/
+      Handler: app.handler
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            Path: /profile
+            Method: get

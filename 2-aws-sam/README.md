@@ -1,6 +1,6 @@
 # Execução local com AWS SAM
 
-Usa o mesmo código da Lambda (`../pulumi/lanchonetes`) com DynamoDB Local.
+Usa o mesmo código da Lambda (`../3-pulumi/lanchonetes`) com DynamoDB Local.
 
 ```bash
 cd aws-sam

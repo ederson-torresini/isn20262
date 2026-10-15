@@ -8,7 +8,7 @@ dynamodb = boto3.resource(
     aws_secret_access_key="local",
 )
 
-# Mantém os mesmos dados de teste de pulumi/__main__.py.
+# Mantém os mesmos dados de teste de 3-pulumi/__main__.py.
 LANCHONETES = [
     ("1", "Lanchonete Central", "Praça da Sé, São Paulo", "-23.5505", "-46.6333"),
     (

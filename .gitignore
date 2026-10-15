@@ -7,3 +7,7 @@ aws/
 .aws-sam-cli
 aws-sam-cli-linux-x86_64.zip
 sam-installation/
+.aws-sam/
+
+# tmux
+tmux-*

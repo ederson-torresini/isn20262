@@ -1,26 +1,26 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: "Lanchonetes pr\xF3ximas (execu\xE7\xE3o local com SAM)"
+Description: Lanchonetes próximas (execução local com SAM)
+
 Resources:
   LanchonetesProximas:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: LanchonetesProximas
+      CodeUri: ../3-pulumi/lanchonetes/
       Handler: handler.lambda_handler
       Runtime: python3.13
       Timeout: 10
       Environment:
         Variables:
           TABLE_NAME: lanchonetes
-          DYNAMODB_ENDPOINT: ''
-          AWS_ACCESS_KEY_ID: ''
-          AWS_SECRET_ACCESS_KEY: ''
-          AWS_DEFAULT_REGION: ''
+          # Declaradas aqui para que o env.json possa sobrescrevê-las.
+          DYNAMODB_ENDPOINT: ""
+          AWS_ACCESS_KEY_ID: ""
+          AWS_SECRET_ACCESS_KEY: ""
+          AWS_DEFAULT_REGION: ""
       Events:
         Api:
           Type: Api
           Properties:
             Path: /lanchonetes-proximas
             Method: post
-    Metadata:
-      SamResourceId: LanchonetesProximas
