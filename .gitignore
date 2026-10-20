@@ -1,3 +1,6 @@
+# Node.js
+node_modules/
+
 # AWS CLI v2
 .aws-cli/
 awscliv2.zip
