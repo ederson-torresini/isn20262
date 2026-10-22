@@ -24,7 +24,7 @@ dev:
 	tmux send-keys -t $$TOP    "make up logs" C-m; \
 	tmux send-keys -t $$BOTTOM "make api" C-m; \
 	tmux send-keys -t $$RIGHT  "clear" C-m; \
-	tmux send-keys -t $$RIGHT  "make post"; \
+	tmux send-keys -t $$RIGHT  "make post; sleep 3; make get"; \
 	tmux select-pane -t $$RIGHT; \
 	exec tmux attach -t $(SESSION)
 
