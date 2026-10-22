@@ -8,7 +8,7 @@ import boto3
 
 # DYNAMODB_ENDPOINT só é definido em testes locais (DynamoDB Local).
 table = boto3.resource(
-    "dynamodb", endpoint_url=os.environ.get("DYNAMODB_ENDPOINT")
+    "dynamodb", endpoint_url=os.environ.get("DYNAMODB_ENDPOINT") or None
 ).Table(os.environ["TABLE_NAME"])
 
 HEADERS = {"Content-Type": "application/json"}
