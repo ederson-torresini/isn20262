@@ -11,3 +11,6 @@ sam-installation/
 
 # tmux
 tmux-*
+
+# Node.js
+node_modules/
