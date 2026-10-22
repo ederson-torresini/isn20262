@@ -28,17 +28,15 @@ const page = `<!doctype html>
 <div id="map"></div>
 <main>
   <h1>Banheiros familiares</h1>
-  <p>Clique no mapa para escolher o local e marque os recursos disponíveis.</p>
+  <p>Clique no mapa para escolher o local e informe as categorias que quiser.</p>
   <form id="form">
     <p>
       Latitude <input id="lat" type="number" step="any" required>
       Longitude <input id="lon" type="number" step="any" required>
     </p>
     <p>
-      <label><input type="checkbox" name="masculino"> Masculino</label>
-      <label><input type="checkbox" name="feminino"> Feminino</label>
-      <label><input type="checkbox" name="infantil"> Infantil</label>
-      <label><input type="checkbox" name="fraldario"> Fraldário</label>
+      <label>Categorias (separadas por vírgula)
+        <input id="cats" type="text" placeholder="ex.: unissex, acessível, fraldário"></label>
     </p>
     <button>Cadastrar</button>
     <div id="msg"></div>
@@ -55,9 +53,9 @@ const layer = L.layerGroup().addTo(map);
 const msg = document.getElementById("msg");
 
 function label(b) {
-  const tipos = ["masculino", "feminino", "infantil", "fraldario"]
-    .filter((t) => b[t]).join(", ");
-  return tipos || "sem recursos informados";
+  const div = document.createElement("div");
+  div.textContent = (b.categorias || []).join(", ") || "sem categorias informadas";
+  return div;
 }
 
 async function load() {
@@ -80,8 +78,7 @@ document.getElementById("form").addEventListener("submit", async (ev) => {
     latitude: parseFloat(f.lat.value),
     longitude: parseFloat(f.lon.value),
   };
-  ["masculino", "feminino", "infantil", "fraldario"].forEach(
-    (t) => (body[t] = f.elements[t].checked));
+  body.categorias = f.cats.value.split(",").map((c) => c.trim()).filter(Boolean);
   const res = await fetch(CONFIG.postUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -99,7 +96,12 @@ load().catch((e) => (msg.textContent = "Erro ao carregar: " + e));
 app.get("/", (req, res) => {
   res
     .type("html")
-    .send(page.replace("__CONFIG__", JSON.stringify(config).replace(/</g, "\\u003c")));
+    .send(
+      page.replace(
+        "__CONFIG__",
+        JSON.stringify(config).replace(/</g, "\\u003c"),
+      ),
+    );
 });
 
 module.exports = app;

@@ -91,16 +91,16 @@ table_env = aws.lambda_.FunctionEnvironmentArgs(variables={"TABLE_NAME": table.n
 
 get_fn, get_url = public_function(
     "banheiros-get",
-    runtime=aws.lambda_.Runtime.PYTHON3D13,
-    handler="handler.lambda_handler",
+    runtime=aws.lambda_.Runtime.NODE_JS22D_X,
+    handler="index.handler",
     code=pulumi.FileArchive("./banheiros_get"),
     environment=table_env,
 )
 
 post_fn, post_url = public_function(
     "banheiros-post",
-    runtime=aws.lambda_.Runtime.PYTHON3D13,
-    handler="handler.lambda_handler",
+    runtime=aws.lambda_.Runtime.NODE_JS22D_X,
+    handler="index.handler",
     code=pulumi.FileArchive("./banheiros_post"),
     environment=table_env,
 )

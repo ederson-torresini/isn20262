@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
 # Usado apenas pelo "sam local" (make dev); a infraestrutura real está em __main__.py.
@@ -21,9 +21,9 @@ Resources:
   GetBanheirosFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: python3.13
+      Runtime: nodejs22.x
       CodeUri: banheiros_get/
-      Handler: handler.lambda_handler
+      Handler: index.handler
       Events:
         Get:
           Type: Api
@@ -34,9 +34,9 @@ Resources:
   PostBanheirosFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: python3.13
+      Runtime: nodejs22.x
       CodeUri: banheiros_post/
-      Handler: handler.lambda_handler
+      Handler: index.handler
       Events:
         Post:
           Type: Api

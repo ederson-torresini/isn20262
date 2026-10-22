@@ -4,10 +4,7 @@ ENDPOINT := http://localhost:8000
 API      := http://127.0.0.1:3000
 LAT      ?= -27.5954
 LON      ?= -48.5480
-MASC     ?= true
-FEM      ?= true
-INF      ?= true
-FRALD    ?= true
+CATS     ?= "masculino","feminino","fraldário"
 
 # Dummy credentials, exported to every command below (used by the aws CLI)
 export AWS_ACCESS_KEY_ID     := local
@@ -55,7 +52,7 @@ api: wait-table build
 post:
 	curl -X POST $(API)/banheiros \
 		-H 'Content-Type: application/json' \
-		-d '{"latitude": $(LAT), "longitude": $(LON), "masculino": $(MASC), "feminino": $(FEM), "infantil": $(INF), "fraldario": $(FRALD)}'
+		-d '{"latitude": $(LAT), "longitude": $(LON), "categorias": [$(CATS)]}'
 	@echo
 
 get:
