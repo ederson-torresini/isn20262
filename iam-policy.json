@@ -10,6 +10,9 @@
         "iam:DeleteRolePolicy",
         "iam:PutRolePolicy",
         "iam:DetachRolePolicy",
+        "lambda:AddPermission",
+        "lambda:CreateFunctionUrlConfig",
+        "lambda:DeleteFunctionUrlConfig",
         "iam:get*",
         "iam:list*",
         "route53:CreateHostedZone",
@@ -28,6 +31,7 @@
         "dynamodb:Scan",
         "lambda:CreateFunction",
         "lambda:DeleteFunction",
+        "lambda:RemovePermission",
         "lambda:get*",
         "lambda:list*"
       ],

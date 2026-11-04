@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+# Usado apenas pelo "sam local" (make dev); a infraestrutura real está em __main__.py.
+Globals:
+  Api:
+    Cors:
+      AllowMethods: "'*'"
+      AllowHeaders: "'content-type'"
+      AllowOrigin: "'*'"
+  Function:
+    Timeout: 10
+    Environment:
+      Variables:
+        DYNAMODB_ENDPOINT: ""
+        TABLE_NAME: banheiros
+        API_GET_URL: ""
+        API_POST_URL: ""
+
+Resources:
+  GetBanheirosFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs22.x
+      CodeUri: banheiros_get/
+      Handler: index.handler
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            Path: /banheiros
+            Method: get
+
+  PostBanheirosFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs22.x
+      CodeUri: banheiros_post/
+      Handler: index.handler
+      Events:
+        Post:
+          Type: Api
+          Properties:
+            Path: /banheiros
+            Method: post
+
+  WebFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs22.x
+      CodeUri: web/
+      Handler: index.handler
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
