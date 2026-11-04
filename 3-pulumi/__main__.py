@@ -1,4 +1,6 @@
 import json
+import subprocess
+from pathlib import Path
 
 import pulumi
 import pulumi_aws as aws
@@ -105,11 +107,14 @@ post_fn, post_url = public_function(
     environment=table_env,
 )
 
+web_dir = Path(__file__).parent / "web"
+subprocess.run(["npm", "ci", "--omit=dev"], cwd=web_dir, check=True)
+
 web_fn, web_url = public_function(
     "banheiros-web",
     runtime=aws.lambda_.Runtime.NODE_JS22D_X,
     handler="index.handler",
-    code=pulumi.FileArchive("./web"),
+    code=pulumi.FileArchive(str(web_dir)),
     environment=aws.lambda_.FunctionEnvironmentArgs(
         variables={
             "API_GET_URL": get_url.function_url,
