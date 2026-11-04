@@ -14,6 +14,7 @@ No serviço [IAM](https://console.aws.amazon.com/iam/):
 1. Criar um [grupo de usuário](https://console.aws.amazon.com/iam#/groups).
 1. Criar um [usuário](https://console.aws.amazon.com/iam#/users) e associá-lo ao grupo criado. Importante: esse usuário não deve ter acesso ao AWS Management Console.
 1. Criar uma política de acordo com [iam-policy.json](iam-policy.json) e associá-la ao grupo criado.
+1. Adicionar, também, as seguintes políticas para o ambiente de **desenvolvimento** (a ser atualizado posteriormente): `AmazonAPIGatewayAdministrator`, `AmazonDynamoDBFullAccess_v2`, `AmazonRoute53FullAccess`, `AWSLambda_FullAccess`, `CloudFrontFullAccess`.
 1. De volta ao usuário criado, deve-se criar uma chave de acesso, a qual é composta por um identificador (`AWS_ACCESS_KEY_ID`) e a chave propriamente dita (`AWS_SECRET_ACCESS_KEY`).
 
 No [GitHub Codespaces](https://github.com/settings/codespaces):
