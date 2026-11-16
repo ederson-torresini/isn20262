@@ -62,12 +62,12 @@ aws.iam.RolePolicy(
 )
 
 # --- S3 Bucket for static website ---
-web_bucket = aws.s3.BucketV2(
+web_bucket = aws.s3.Bucket(
     "banheiros-web",
     tags={"Name": "banheiros-web"},
 )
 
-web_bucket_acl = aws.s3.BucketAclV2(
+web_bucket_acl = aws.s3.BucketAcl(
     "banheiros-web-acl",
     bucket=web_bucket.id,
     acl="private",
@@ -229,7 +229,9 @@ distribution = aws.cloudfront.Distribution(
         aws.cloudfront.DistributionOriginArgs(
             domain_name=s3_domain,
             origin_id="s3",
-            s3_origin_config=aws.cloudfront.DistributionOriginS3OriginConfigArgs(),
+            s3_origin_config=aws.cloudfront.DistributionOriginS3OriginConfigArgs(
+                origin_access_identity="",  # S3 is private, accessed only via CloudFront
+            ),
         ),
     ],
     default_cache_behavior=aws.cloudfront.DistributionDefaultCacheBehaviorArgs(
