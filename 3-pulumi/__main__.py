@@ -61,6 +61,48 @@ aws.iam.RolePolicy(
     ),
 )
 
+# --- S3 Bucket for static website ---
+web_bucket = aws.s3.BucketV2(
+    "banheiros-web",
+    tags={"Name": "banheiros-web"},
+)
+
+web_bucket_acl = aws.s3.BucketAclV2(
+    "banheiros-web-acl",
+    bucket=web_bucket.id,
+    acl="private",
+)
+
+# Build React app
+web_dir = Path(__file__).parent / "web-react"
+subprocess.run(["npm", "ci"], cwd=web_dir, check=True)
+subprocess.run(["npm", "run", "build"], cwd=web_dir, check=True)
+
+# Upload React app files to S3
+dist_dir = web_dir / "dist"
+for file_path in dist_dir.rglob("*"):
+    if file_path.is_file():
+        relative_path = file_path.relative_to(dist_dir)
+        mime_type = "text/html"
+        if file_path.suffix == ".js":
+            mime_type = "application/javascript"
+        elif file_path.suffix == ".css":
+            mime_type = "text/css"
+        elif file_path.suffix == ".svg":
+            mime_type = "image/svg+xml"
+        elif file_path.suffix == ".png":
+            mime_type = "image/png"
+        elif file_path.suffix == ".jpg" or file_path.suffix == ".jpeg":
+            mime_type = "image/jpeg"
+
+        aws.s3.BucketObject(
+            f"web-{relative_path.as_posix().replace('/', '-').replace('.', '_')}",
+            bucket=web_bucket.id,
+            key=relative_path.as_posix(),
+            source=pulumi.FileAsset(str(file_path)),
+            content_type=mime_type,
+            cache_control="max-age=3600" if relative_path.name != "index.html" else "max-age=0, no-cache",
+        )
 
 # --- API Gateway (HTTP API) ---
 api = aws.apigatewayv2.Api("banheiros-api", protocol_type="HTTP")
@@ -119,24 +161,6 @@ post_fn = public_function(
     environment=table_env,
 )
 
-web_dir = Path(__file__).parent / "web"
-subprocess.run(["npm", "ci", "--omit=dev"], cwd=web_dir, check=True)
-
-web_fn = public_function(
-    "banheiros-web",
-    "GET",
-    "/",
-    runtime=aws.lambda_.Runtime.NODE_JS22D_X,
-    handler="index.handler",
-    code=pulumi.FileArchive(str(web_dir)),
-    environment=aws.lambda_.FunctionEnvironmentArgs(
-        variables={
-            "API_GET_URL": "/banheiros",
-            "API_POST_URL": "/banheiros",
-        }
-    ),
-)
-
 # --- CloudFront (+ ACM e Route53 em prod) ---
 aliases = []
 viewer_cert = aws.cloudfront.DistributionViewerCertificateArgs(
@@ -177,11 +201,13 @@ if is_prod:
     )
 
 caching_disabled = aws.cloudfront.get_cache_policy(name="Managed-CachingDisabled")
+caching_optimized = aws.cloudfront.get_cache_policy(name="Managed-CachingOptimized")
 all_viewer_except_host = aws.cloudfront.get_origin_request_policy(
     name="Managed-AllViewerExceptHostHeader"
 )
 
 api_hostname = api.api_endpoint.apply(lambda e: e.replace("https://", "").split("/")[0])
+s3_domain = web_bucket.bucket_regional_domain_name
 
 distribution = aws.cloudfront.Distribution(
     "banheiros-cdn",
@@ -199,7 +225,12 @@ distribution = aws.cloudfront.Distribution(
                 origin_protocol_policy="https-only",
                 origin_ssl_protocols=["TLSv1.2"],
             ),
-        )
+        ),
+        aws.cloudfront.DistributionOriginArgs(
+            domain_name=s3_domain,
+            origin_id="s3",
+            s3_origin_config=aws.cloudfront.DistributionOriginS3OriginConfigArgs(),
+        ),
     ],
     default_cache_behavior=aws.cloudfront.DistributionDefaultCacheBehaviorArgs(
         target_origin_id="api",
@@ -209,6 +240,16 @@ distribution = aws.cloudfront.Distribution(
         cache_policy_id=caching_disabled.id,
         origin_request_policy_id=all_viewer_except_host.id,
     ),
+    ordered_cache_behaviors=[
+        aws.cloudfront.DistributionOrderedCacheBehaviorArgs(
+            path_pattern="/*",
+            target_origin_id="s3",
+            viewer_protocol_policy="redirect-to-https",
+            allowed_methods=["GET", "HEAD"],
+            cached_methods=["GET", "HEAD"],
+            cache_policy_id=caching_optimized.id,
+        ),
+    ],
     viewer_certificate=viewer_cert,
     restrictions=aws.cloudfront.DistributionRestrictionsArgs(
         geo_restriction=aws.cloudfront.DistributionRestrictionsGeoRestrictionArgs(
@@ -235,6 +276,7 @@ if is_prod:
 
 pulumi.export("table_name", table.name)
 pulumi.export("api_url", api.api_endpoint)
+pulumi.export("s3_bucket", web_bucket.id)
 pulumi.export(
     "url",
     (
