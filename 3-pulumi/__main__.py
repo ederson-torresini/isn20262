@@ -65,12 +65,26 @@ aws.iam.RolePolicy(
 web_bucket = aws.s3.Bucket(
     "banheiros-web",
     tags={"Name": "banheiros-web"},
+    acl="private",
 )
 
-web_bucket_acl = aws.s3.BucketAcl(
-    "banheiros-web-acl",
+# Origin Access Identity for CloudFront to access private S3 bucket
+oai = aws.cloudfront.OriginAccessIdentity(
+    "banheiros-oai",
+    comment="OAI for banheiros-web S3 bucket",
+)
+
+# Bucket Policy to allow CloudFront to read objects
+bucket_policy = aws.s3.BucketPolicy(
+    "banheiros-web-policy",
     bucket=web_bucket.id,
-    acl="private",
+    policy=pulumi.Output.concat(
+        '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":"',
+        oai.iam_arn,
+        '"},"Action":"s3:GetObject","Resource":"',
+        web_bucket.arn,
+        '/*"}]}',
+    ),
 )
 
 # Build React app
@@ -215,6 +229,7 @@ distribution = aws.cloudfront.Distribution(
     is_ipv6_enabled=True,
     http_version="http2and3",
     aliases=aliases,
+    default_root_object="index.html",
     origins=[
         aws.cloudfront.DistributionOriginArgs(
             domain_name=api_hostname,
@@ -230,26 +245,26 @@ distribution = aws.cloudfront.Distribution(
             domain_name=s3_domain,
             origin_id="s3",
             s3_origin_config=aws.cloudfront.DistributionOriginS3OriginConfigArgs(
-                origin_access_identity="",  # S3 is private, accessed only via CloudFront
+                origin_access_identity=oai.cloudfront_access_identity_path,
             ),
         ),
     ],
     default_cache_behavior=aws.cloudfront.DistributionDefaultCacheBehaviorArgs(
-        target_origin_id="api",
+        target_origin_id="s3",
         viewer_protocol_policy="redirect-to-https",
-        allowed_methods=["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"],
+        allowed_methods=["GET", "HEAD"],
         cached_methods=["GET", "HEAD"],
-        cache_policy_id=caching_disabled.id,
-        origin_request_policy_id=all_viewer_except_host.id,
+        cache_policy_id=caching_optimized.id,
     ),
     ordered_cache_behaviors=[
         aws.cloudfront.DistributionOrderedCacheBehaviorArgs(
-            path_pattern="/*",
-            target_origin_id="s3",
+            path_pattern="/banheiros*",
+            target_origin_id="api",
             viewer_protocol_policy="redirect-to-https",
-            allowed_methods=["GET", "HEAD"],
+            allowed_methods=["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"],
             cached_methods=["GET", "HEAD"],
-            cache_policy_id=caching_optimized.id,
+            cache_policy_id=caching_disabled.id,
+            origin_request_policy_id=all_viewer_except_host.id,
         ),
     ],
     viewer_certificate=viewer_cert,
